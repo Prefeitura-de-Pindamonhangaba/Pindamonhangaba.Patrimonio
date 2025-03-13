@@ -3,7 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "start": "node dist/main/server.js",
+    "dev": "nodemon --exec ts-node src/main/server.ts",
+    "db:create": "npx sequelize-cli db:create",
+    "db:migrate": "npx sequelize-cli db:migrate",
+    "db:seed": "npx sequelize-cli db:seed:all",
+    "db:migrate:undo:all": "npx sequelize-cli db:migrate:undo:all"
   },
   "keywords": [],
   "author": "",
