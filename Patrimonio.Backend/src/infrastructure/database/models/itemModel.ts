@@ -10,13 +10,6 @@ export class ItemModel extends Model {
     allowNull: false,
     unique: true,
   })
-  code!: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-    unique: true,
-  })
   assetCode!: string;
 
   @Column({

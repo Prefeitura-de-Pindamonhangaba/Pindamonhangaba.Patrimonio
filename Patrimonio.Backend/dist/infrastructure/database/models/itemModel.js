@@ -21,14 +21,6 @@ __decorate([
         unique: true,
     }),
     __metadata("design:type", String)
-], ItemModel.prototype, "code", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING,
-        allowNull: false,
-        unique: true,
-    }),
-    __metadata("design:type", String)
 ], ItemModel.prototype, "assetCode", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({

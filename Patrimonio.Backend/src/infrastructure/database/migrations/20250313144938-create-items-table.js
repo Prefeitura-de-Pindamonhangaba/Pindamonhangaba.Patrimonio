@@ -9,11 +9,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      code: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: true,
-      },
       assetCode: {
         type: Sequelize.STRING,
         allowNull: false,
