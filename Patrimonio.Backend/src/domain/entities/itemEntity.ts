@@ -8,12 +8,12 @@ export class Item {
     public acquisitionMethod: string,
     public supplier: string,
     public physicalLocation: PhysicalLocation,
-    public oldPhysicalLocation: PhysicalLocation,
     public imageUrl: string,
     public status: string,
     public inventoried: boolean,
     public reference: string,
     public observation: string,
+    public oldPhysicalLocation: PhysicalLocation | null,
     public createdAt?: Date,
     public updatedAt?: Date
   ) {}

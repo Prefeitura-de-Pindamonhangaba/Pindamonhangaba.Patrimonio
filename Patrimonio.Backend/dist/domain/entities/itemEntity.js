@@ -2,19 +2,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Item = void 0;
 class Item {
-    constructor(assetCode, description, acquisitionDate, acquisitionMethod, supplier, physicalLocation, oldPhysicalLocation, imageUrl, status, inventoried, reference, observation, createdAt, updatedAt) {
+    constructor(assetCode, description, acquisitionDate, acquisitionMethod, supplier, physicalLocation, imageUrl, status, inventoried, reference, observation, oldPhysicalLocation, createdAt, updatedAt) {
         this.assetCode = assetCode;
         this.description = description;
         this.acquisitionDate = acquisitionDate;
         this.acquisitionMethod = acquisitionMethod;
         this.supplier = supplier;
         this.physicalLocation = physicalLocation;
-        this.oldPhysicalLocation = oldPhysicalLocation;
         this.imageUrl = imageUrl;
         this.status = status;
         this.inventoried = inventoried;
         this.reference = reference;
         this.observation = observation;
+        this.oldPhysicalLocation = oldPhysicalLocation;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
