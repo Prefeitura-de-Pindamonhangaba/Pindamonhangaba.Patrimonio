@@ -21,7 +21,7 @@ export class PhysicalLocation {
     public updatedAt: Date,
   ) {}
 
-  toPlainObject(): any {
+  public toPlainObject(): any {
     return {
       referencial: this.referencial,
       refProprio: this.refProprio,

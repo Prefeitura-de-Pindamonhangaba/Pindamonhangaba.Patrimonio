@@ -2,8 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Item = void 0;
 class Item {
-    constructor(id, assetCode, description, acquisitionDate, acquisitionMethod, supplier, physicalLocation, oldPhysicalLocation, imageUrl, status, inventoried, reference, observation, changed, createdAt, updatedAt) {
-        this.id = id;
+    constructor(assetCode, description, acquisitionDate, acquisitionMethod, supplier, physicalLocation, oldPhysicalLocation, imageUrl, status, inventoried, reference, observation, createdAt, updatedAt) {
         this.assetCode = assetCode;
         this.description = description;
         this.acquisitionDate = acquisitionDate;
@@ -16,9 +15,26 @@ class Item {
         this.inventoried = inventoried;
         this.reference = reference;
         this.observation = observation;
-        this.changed = changed;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+    toPlainObject() {
+        return {
+            assetCode: this.assetCode,
+            description: this.description,
+            acquisitionDate: this.acquisitionDate,
+            acquisitionMethod: this.acquisitionMethod,
+            supplier: this.supplier,
+            physicalLocation: this.physicalLocation,
+            oldPhysicalLocation: this.oldPhysicalLocation,
+            imageUrl: this.imageUrl,
+            status: this.status,
+            inventoried: this.inventoried,
+            reference: this.reference,
+            observation: this.observation,
+            createdAt: this.createdAt,
+            updatedAt: this.updatedAt,
+        };
     }
 }
 exports.Item = Item;

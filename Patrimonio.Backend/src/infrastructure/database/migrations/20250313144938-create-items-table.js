@@ -7,7 +7,7 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.INTEGER
       },
       assetCode: {
         type: Sequelize.STRING,
@@ -30,12 +30,12 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      physicalLocation: {
-        type: Sequelize.STRING,
+      physicalLocationId: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
-      oldPhysicalLocation: {
-        type: Sequelize.STRING,
+      oldPhysicalLocationId: {
+        type: Sequelize.INTEGER,
         allowNull: true,
       },
       imageUrl: {

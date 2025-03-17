@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemModel = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
+const physicalLocationModel_1 = require("./physicalLocationModel");
 let ItemModel = class ItemModel extends sequelize_typescript_1.Model {
 };
 exports.ItemModel = ItemModel;
@@ -51,18 +52,28 @@ __decorate([
     __metadata("design:type", String)
 ], ItemModel.prototype, "supplier", void 0);
 __decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => physicalLocationModel_1.PhysicalLocationModel),
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING,
+        type: sequelize_typescript_1.DataType.INTEGER,
         allowNull: false,
     }),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
+], ItemModel.prototype, "physicalLocationId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => physicalLocationModel_1.PhysicalLocationModel),
+    __metadata("design:type", physicalLocationModel_1.PhysicalLocationModel)
 ], ItemModel.prototype, "physicalLocation", void 0);
 __decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => physicalLocationModel_1.PhysicalLocationModel),
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING,
+        type: sequelize_typescript_1.DataType.INTEGER,
         allowNull: true,
     }),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
+], ItemModel.prototype, "oldPhysicalLocationId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => physicalLocationModel_1.PhysicalLocationModel),
+    __metadata("design:type", physicalLocationModel_1.PhysicalLocationModel)
 ], ItemModel.prototype, "oldPhysicalLocation", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({

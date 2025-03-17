@@ -1,4 +1,5 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { PhysicalLocationModel } from './physicalLocationModel';
 
 @Table({
   tableName: 'items',
@@ -36,17 +37,25 @@ export class ItemModel extends Model {
   })
   supplier!: string;
 
+  @ForeignKey(() => PhysicalLocationModel)
   @Column({
-    type: DataType.STRING,
+    type: DataType.INTEGER,
     allowNull: false,
   })
-  physicalLocation!: string;
+  physicalLocationId!: number;
 
+  @BelongsTo(() => PhysicalLocationModel)
+  physicalLocation!: PhysicalLocationModel;
+
+  @ForeignKey(() => PhysicalLocationModel)
   @Column({
-    type: DataType.STRING,
+    type: DataType.INTEGER,
     allowNull: true,
   })
-  oldPhysicalLocation!: string;
+  oldPhysicalLocationId!: number;
+
+  @BelongsTo(() => PhysicalLocationModel)
+  oldPhysicalLocation!: PhysicalLocationModel;
 
   @Column({
     type: DataType.STRING,
