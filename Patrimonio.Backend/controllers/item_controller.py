@@ -88,3 +88,65 @@ def create_item():
         return jsonify({'error': str(e)}), 500
     finally:
         db.close()
+
+@item_bp.route('', methods=['GET'])
+def listAllItems():
+    db = SessionLocal()
+    try:
+        items = db.query(Item).all()
+        result = []
+        for item in items:
+            result.append({
+                'id': item.id,
+                'assetCode': item.assetCode,
+                'description': item.description,
+                'acquisitionDate': item.acquisitionDate.isoformat() if item.acquisitionDate else None,
+                'acquisitionMethod': item.acquisitionMethod,
+                'supplier': item.supplier,
+                'physicalLocationId': item.physicalLocationId,
+                'oldPhysicalLocationId': item.oldPhysicalLocationId,
+                'imageUrl': item.imageUrl,
+                'status': item.status,
+                'inventoried': item.inventoried,
+                'reference': item.reference,
+                'observation': item.observation,
+                'itemChanged': item.itemChanged,
+                'createdAt': item.createdAt.isoformat(),
+                'updatedAt': item.updatedAt.isoformat()
+            })
+        return jsonify(result), 201
+    except Exception as e:
+        db.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        db.close()
+
+@item_bp.route('/<int:item_id>', methods=['GET'])
+def getItemById(item_id):
+    db = SessionLocal()
+    try:
+        item = db.query(Item).filter(Item.id == item_id).first()
+        print(item_id)
+        return jsonify({
+            'id': item.id,
+            'assetCode': item.assetCode,
+            'description': item.description,
+            'acquisitionDate': item.acquisitionDate.isoformat() if item.acquisitionDate else None,
+            'acquisitionMethod': item.acquisitionMethod,
+            'supplier': item.supplier,
+            'physicalLocationId': item.physicalLocationId,
+            'oldPhysicalLocationId': item.oldPhysicalLocationId,
+            'imageUrl': item.imageUrl,
+            'status': item.status,
+            'inventoried': item.inventoried,
+            'reference': item.reference,
+            'observation': item.observation,
+            'itemChanged': item.itemChanged,
+            'createdAt': item.createdAt.isoformat(),
+            'updatedAt': item.updatedAt.isoformat()
+        }), 201
+    except Exception as e:
+        db.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        db.close()
