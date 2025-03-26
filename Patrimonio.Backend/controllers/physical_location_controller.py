@@ -5,37 +5,15 @@ from sqlalchemy.ext.declarative import declarative_base
 import os
 from dotenv import load_dotenv
 from datetime import datetime
+from models.physical_location_model import PhysicalLocation
 
 load_dotenv()
+
+Base = declarative_base()
 
 DATABASE_URL = f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}/{os.getenv('DB_NAME')}"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-Base = declarative_base()
-
-class PhysicalLocation(Base):
-    __tablename__ = 'physicalLocations'
-
-    id = Column(Integer, primary_key=True, index=True)
-    referencial = Column(String)
-    refProprio = Column(String)
-    refSubordinacao = Column(String)
-    refSubordinacaoAdmMigra = Column(String)
-    refResponsavel = Column(String)
-    refTipoMigra = Column(String)
-    sigla = Column(String)
-    ativo = Column(Boolean, default=True)
-    obs = Column(String)
-    modulo = Column(String)
-    nivel = Column(Integer)
-    codigo = Column(String)
-    descricao = Column(String)
-    unidadeGestora = Column(String)
-    refTipo = Column(String)
-    refSubordinacaoAdm = Column(String)
-    createdAt = Column(DateTime, default=datetime.utcnow)
-    updatedAt = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 Base.metadata.create_all(bind=engine)
 

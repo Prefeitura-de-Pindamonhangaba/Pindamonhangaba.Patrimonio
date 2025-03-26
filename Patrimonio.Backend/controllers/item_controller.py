@@ -5,6 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 import os
 from dotenv import load_dotenv
 from datetime import datetime
+from models.physical_location_model import PhysicalLocation
 
 load_dotenv()
 
@@ -96,6 +97,9 @@ def listAllItems():
         items = db.query(Item).all()
         result = []
         for item in items:
+            physicalLocation = db.query(PhysicalLocation).filter(Item.physicalLocationId == PhysicalLocation.id).first()
+            oldPhysicalLocation = db.query(PhysicalLocation).filter(Item.oldPhysicalLocationId == PhysicalLocation.id).first()
+
             result.append({
                 'id': item.id,
                 'assetCode': item.assetCode,
@@ -103,8 +107,48 @@ def listAllItems():
                 'acquisitionDate': item.acquisitionDate.isoformat() if item.acquisitionDate else None,
                 'acquisitionMethod': item.acquisitionMethod,
                 'supplier': item.supplier,
-                'physicalLocationId': item.physicalLocationId,
-                'oldPhysicalLocationId': item.oldPhysicalLocationId,
+                'physicalLocation': {
+                    'id': physicalLocation.id,
+                    'referencial': physicalLocation.referencial,
+                    'refProprio': physicalLocation.refProprio,
+                    'refSubordinacao': physicalLocation.refSubordinacao,
+                    'refSubordinacaoAdmMigra': physicalLocation.refSubordinacaoAdmMigra,
+                    'refResponsavel': physicalLocation.refResponsavel,
+                    'refTipoMigra': physicalLocation.refTipoMigra,
+                    'sigla': physicalLocation.sigla,
+                    'ativo': physicalLocation.ativo,
+                    'obs': physicalLocation.obs,
+                    'modulo': physicalLocation.modulo,
+                    'nivel': physicalLocation.nivel,
+                    'codigo': physicalLocation.codigo,
+                    'descricao': physicalLocation.descricao,
+                    'unidadeGestora': physicalLocation.unidadeGestora,
+                    'refTipo': physicalLocation.refTipo,
+                    'refSubordinacaoAdm': physicalLocation.refSubordinacaoAdm,
+                    'createdAt': physicalLocation.createdAt.isoformat(),
+                    'updatedAt': physicalLocation.updatedAt.isoformat()
+                } if physicalLocation else None,
+                'oldPhysicalLocation': {
+                    'id': oldPhysicalLocation.id,
+                    'referencial': oldPhysicalLocation.referencial,
+                    'refProprio': oldPhysicalLocation.refProprio,
+                    'refSubordinacao': oldPhysicalLocation.refSubordinacao,
+                    'refSubordinacaoAdmMigra': oldPhysicalLocation.refSubordinacaoAdmMigra,
+                    'refResponsavel': oldPhysicalLocation.refResponsavel,
+                    'refTipoMigra': oldPhysicalLocation.refTipoMigra,
+                    'sigla': oldPhysicalLocation.sigla,
+                    'ativo': oldPhysicalLocation.ativo,
+                    'obs': oldPhysicalLocation.obs,
+                    'modulo': oldPhysicalLocation.modulo,
+                    'nivel': oldPhysicalLocation.nivel,
+                    'codigo': oldPhysicalLocation.codigo,
+                    'descricao': oldPhysicalLocation.descricao,
+                    'unidadeGestora': oldPhysicalLocation.unidadeGestora,
+                    'refTipo': oldPhysicalLocation.refTipo,
+                    'refSubordinacaoAdm': oldPhysicalLocation.refSubordinacaoAdm,
+                    'createdAt': oldPhysicalLocation.createdAt.isoformat(),
+                    'updatedAt': oldPhysicalLocation.updatedAt.isoformat()
+                } if oldPhysicalLocation else None,
                 'imageUrl': item.imageUrl,
                 'status': item.status,
                 'inventoried': item.inventoried,
