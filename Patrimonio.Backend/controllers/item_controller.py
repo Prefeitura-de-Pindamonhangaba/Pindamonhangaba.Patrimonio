@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, or_
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 import os
@@ -94,13 +94,30 @@ def create_item():
 def listAllItems():
     db = SessionLocal()
     try:
-        asset_code = request.args.get('assetCode')
+        # Get pagination parameters
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 10, type=int)
+        search = request.args.get('search', '')
+        
+        # Base query
         query = db.query(Item)
         
-        if asset_code:
-            query = query.filter(Item.assetCode.ilike(f'%{asset_code}%'))
+        # Apply search filter if provided
+        if search:
+            query = query.filter(
+                or_(
+                    Item.assetCode.ilike(f'%{search}%'),
+                    Item.description.ilike(f'%{search}%'),
+                    Item.reference.ilike(f'%{search}%')
+                )
+            )
             
-        items = query.all()
+        # Get total count for pagination
+        total = query.count()
+        
+        # Apply pagination
+        items = query.offset((page - 1) * per_page).limit(per_page).all()
+        
         result = []
         for item in items:
             physicalLocation = db.query(PhysicalLocation).filter(Item.physicalLocationId == PhysicalLocation.id).first()
@@ -148,7 +165,14 @@ def listAllItems():
                 'createdAt': item.createdAt.isoformat(),
                 'updatedAt': item.updatedAt.isoformat()
             })
-        return jsonify(result), 201
+            
+        return jsonify({
+            'items': result,
+            'total': total,
+            'page': page,
+            'per_page': per_page,
+            'total_pages': (total + per_page - 1) // per_page
+        }), 200
     except Exception as e:
         db.rollback()
         return jsonify({'error': str(e)}), 500
