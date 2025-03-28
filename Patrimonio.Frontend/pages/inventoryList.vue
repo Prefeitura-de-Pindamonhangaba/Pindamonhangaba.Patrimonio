@@ -1,8 +1,30 @@
 <script setup lang="ts">
 import type { DropdownMenuItem, TableColumn } from '@nuxt/ui';
 import type { Item } from '~/types/item';
+import { refDebounced } from '@vueuse/core';
 
-const { data: dataApi, pending, error, refresh } = await useAsyncData<Item[]>('items', () => 
+const currentPage = ref(1);
+const perPage = ref(10);
+const searchQuery = ref('');
+const totalItems = ref(0);
+const totalPages = ref(1);
+
+// Debounce para evitar muitas requisições durante a digitação
+const debouncedSearch = refDebounced(searchQuery, 500);
+
+// Observa mudanças na busca e atualiza os dados
+watch(debouncedSearch, async () => {
+  currentPage.value = 1; // Reset para primeira página ao buscar
+  await refresh();
+});
+
+const { data: dataApi, pending, error, refresh } = await useAsyncData<{
+  items: Item[];
+  total: number;
+  page: number;
+  per_page: number;
+  total_pages: number;
+}>('items', () => 
   $fetch('http://localhost:5000/item', {
     method: 'GET',
     headers: {
@@ -11,38 +33,42 @@ const { data: dataApi, pending, error, refresh } = await useAsyncData<Item[]>('i
     },
     credentials: 'include',
     mode: 'cors',
-    onRequest({ request, options }) {
-      // Ensure credentials are properly set
-      options.credentials = 'include'
+    params: {
+      page: currentPage.value,
+      per_page: perPage.value,
+      search: searchQuery.value
     }
-  })
+  }),
+  {
+    immediate: true,
+    watch: [currentPage, debouncedSearch]
+  }
 );
-
-const searchQuery = ref('');
 
 const data = computed(() => {
   if (!dataApi.value) return undefined;
-  
-  if (!searchQuery.value) return dataApi.value;
-  
-  const query = searchQuery.value.toLowerCase();
-  return dataApi.value.filter(item => {
-    return (
-      item.assetCode?.toString().toLowerCase().includes(query) ||
-      item.description?.toLowerCase().includes(query) ||
-      item.inventoried?.toString().toLowerCase().includes(query) ||
-      item.physicalLocationId?.toString().toLowerCase().includes(query) ||
-      item.oldPhysicalLocationId?.toString().toLowerCase().includes(query)
-    );
-  });
+  return dataApi.value.items;
 });
+
+// Atualiza os totais quando os dados mudam
+watch(dataApi, (newData) => {
+  if (newData) {
+    totalItems.value = newData.total;
+    totalPages.value = newData.total_pages;
+    currentPage.value = newData.page;
+  }
+}, { immediate: true });
+
+const handlePageChange = async (page: number) => {
+  currentPage.value = page;
+};
 
 const columns: TableColumn<Item>[] = [
   {accessorKey: 'assetCode', header: 'Patrimônio'},
   {accessorKey: 'description', header: 'Descrição'},
   {accessorKey: 'inventoried', header: 'Inventariado'},
-  {accessorKey: 'physicalLocation.descricao', header: 'Local Físico'},
-  {accessorKey: 'oldPhysicalLocation.descricao', header: 'Local Físico Antigo'},
+  {accessorKey: 'physicalLocation.description', header: 'Local Físico'},
+  {accessorKey: 'oldPhysicalLocation.description', header: 'Local Físico Antigo'},
   {id: 'action'}
 ]
 
@@ -116,6 +142,7 @@ function getDropdownActions(item: Item): DropdownMenuItem[][] {
           icon="i-lucide-search"
           placeholder="Buscar patrimônios..."
           class="max-w-sm"
+          :loading="pending"
         />
       </div>
       <UTable 
@@ -134,6 +161,53 @@ function getDropdownActions(item: Item): DropdownMenuItem[][] {
           </UDropdownMenu>
         </template>
       </UTable>
+      <div class="fixed bottom-0 left-[280px] right-0 border-t border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm z-10">
+        <div class="px-4 py-3">
+          <div class="flex items-center justify-between">
+            <div class="text-sm text-gray-500 dark:text-gray-400">
+              Mostrando {{ (currentPage - 1) * perPage + 1 }} a {{ Math.min(currentPage * perPage, totalItems) }} de {{ totalItems }} itens
+            </div>
+            <div class="flex items-center gap-3">
+              <UButton
+                icon="i-lucide-chevron-left"
+                color="primary"
+                variant="ghost"
+                :disabled="currentPage === 1"
+                @click="handlePageChange(currentPage - 1)"
+                class="min-w-[40px] h-10"
+              />
+              <div class="flex items-center gap-1">
+                <template v-for="page in totalPages" :key="page">
+                  <UButton
+                    v-if="page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1)"
+                    :color="page === currentPage ? 'primary' : 'neutral'"
+                    :variant="page === currentPage ? 'solid' : 'ghost'"
+                    @click="handlePageChange(page)"
+                    class="min-w-[40px] h-10 flex items-center justify-center"
+                  >
+                    {{ page }}
+                  </UButton>
+                  <span
+                    v-else-if="page === currentPage - 2 || page === currentPage + 2"
+                    class="px-2 text-gray-500 dark:text-gray-400"
+                  >
+                    ...
+                  </span>
+                </template>
+              </div>
+              <UButton
+                icon="i-lucide-chevron-right"
+                color="primary"
+                variant="ghost"
+                :disabled="currentPage === totalPages"
+                @click="handlePageChange(currentPage + 1)"
+                class="min-w-[40px] h-10"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="h-16"></div>
     </div>
   </div>
 </template>
