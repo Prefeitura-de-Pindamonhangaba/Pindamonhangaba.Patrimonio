@@ -18,9 +18,9 @@ const columns: TableColumn<Item>[] = [
 ]
 
 const router = useRouter();
+const toast = useToast();
 
 const handleRowClick = (row: Item) => {
-  console.log("TESTE")
   router.push(`/item/${row.id}`);
 }
 
@@ -42,8 +42,9 @@ function getDropdownActions(item: Item): DropdownMenuItem[][] {
     ],
     [
       {
-        label: 'Edit',
-        icon: 'i-lucide-edit'
+        label: 'Ver Detalhes',
+        icon: 'i-lucide-eye',
+        onSelect: () => handleRowClick(item)
       },
       {
         label: 'Delete',
