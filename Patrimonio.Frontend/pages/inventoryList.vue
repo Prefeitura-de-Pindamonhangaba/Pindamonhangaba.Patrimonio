@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { TableColumn } from '@nuxt/ui';
+import type { DropdownMenuItem, TableColumn } from '@nuxt/ui';
 import type { Item } from '~/types/item';
 
-let {data: dataApi, status, pending } = await useFetch <Item[]>("http://localhost:5000/item");
+const { data: dataApi, pending, error } = await useFetch<Item[]>("http://localhost:5000/item");
 
-let data: Item[] | undefined
-
-data = dataApi.value === null ? undefined : dataApi.value
+const data = computed(() => {
+  return dataApi.value === null ? undefined : dataApi.value;
+});
 
 const columns: TableColumn<Item>[] = [
   {accessorKey: 'assetCode', header: 'Patrimônio'},
@@ -14,24 +14,77 @@ const columns: TableColumn<Item>[] = [
   {accessorKey: 'inventoried', header: 'Inventariado'},
   {accessorKey: 'physicalLocation.descricao', header: 'Local Físico'},
   {accessorKey: 'oldPhysicalLocation.descricao', header: 'Local Físico Antigo'},
+  {id: 'action'}
 ]
 
 const router = useRouter();
 
-const handleSelectionChange = (selection: Item[]) => {
-  if (selection.length > 0) {
-    router.push(`/item/${selection[0].id}`);
-  }
+const handleRowClick = (row: Item) => {
+  console.log("TESTE")
+  router.push(`/item/${row.id}`);
+}
+
+function getDropdownActions(item: Item): DropdownMenuItem[][] {
+  return [
+    [
+      {
+        label: 'Copia Patrimônio',
+        icon: 'i-lucide-copy',
+        onSelect: () => {
+          navigator.clipboard.writeText(item.assetCode.toString())
+          toast.add({
+            title: 'Patrimônio ID copied to clipboard!',
+            color: 'success',
+            icon: 'i-lucide-circle-check'
+          })
+        }
+      }
+    ],
+    [
+      {
+        label: 'Edit',
+        icon: 'i-lucide-edit'
+      },
+      {
+        label: 'Delete',
+        icon: 'i-lucide-trash',
+        color: 'error'
+      }
+    ]
+  ]
 }
 </script>
 
 <template>
-  <UTable 
-    :data="data" 
-    :columns="columns" 
-    :loading="pending" 
-    class="flex-1" 
-    selectable
-    @update:selected="handleSelectionChange"
-  />
+  <div>
+    <div v-if="pending" class="flex items-center justify-center h-64">
+      <ULoadingBar />
+    </div>
+    <div v-else-if="error" class="flex items-center justify-center h-64">
+      <UAlert
+        title="Erro ao carregar dados"
+        description="Não foi possível carregar a lista de patrimônios. Por favor, tente novamente."
+        color="error"
+        variant="soft"
+      />
+    </div>
+    <UTable 
+      v-else
+      :data="data" 
+      :columns="columns" 
+      class="flex-1" 
+    >
+      <template #action-cell="{ row }">
+      <UDropdownMenu :items="getDropdownActions(row.original)">
+        <UButton
+          icon="i-lucide-ellipsis-vertical"
+          color="neutral"
+          variant="ghost"
+          aria-label="Actions"
+        />
+      </UDropdownMenu>
+    </template>
+    </UTable>
+  </div>
 </template>
+
