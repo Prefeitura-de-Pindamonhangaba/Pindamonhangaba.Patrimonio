@@ -18,8 +18,23 @@ const { data: dataApi, pending, error, refresh } = await useAsyncData<Item[]>('i
   })
 );
 
+const searchQuery = ref('');
+
 const data = computed(() => {
-  return dataApi.value === null ? undefined : dataApi.value;
+  if (!dataApi.value) return undefined;
+  
+  if (!searchQuery.value) return dataApi.value;
+  
+  const query = searchQuery.value.toLowerCase();
+  return dataApi.value.filter(item => {
+    return (
+      item.assetCode?.toString().toLowerCase().includes(query) ||
+      item.description?.toLowerCase().includes(query) ||
+      item.inventoried?.toString().toLowerCase().includes(query) ||
+      item.physicalLocationId?.toString().toLowerCase().includes(query) ||
+      item.oldPhysicalLocationId?.toString().toLowerCase().includes(query)
+    );
+  });
 });
 
 const columns: TableColumn<Item>[] = [
@@ -94,23 +109,32 @@ function getDropdownActions(item: Item): DropdownMenuItem[][] {
         </UButton>
       </div>
     </div>
-    <UTable 
-      v-else
-      :data="data" 
-      :columns="columns" 
-      class="flex-1" 
-    >
-      <template #action-cell="{ row }">
-        <UDropdownMenu :items="getDropdownActions(row.original)">
-          <UButton
-            icon="i-lucide-ellipsis-vertical"
-            color="neutral"
-            variant="ghost"
-            aria-label="Actions"
-          />
-        </UDropdownMenu>
-      </template>
-    </UTable>
+    <div v-else class="space-y-4">
+      <div class="flex items-center justify-between">
+        <UInput
+          v-model="searchQuery"
+          icon="i-lucide-search"
+          placeholder="Buscar patrimônios..."
+          class="max-w-sm"
+        />
+      </div>
+      <UTable 
+        :data="data" 
+        :columns="columns" 
+        class="flex-1" 
+      >
+        <template #action-cell="{ row }">
+          <UDropdownMenu :items="getDropdownActions(row.original)">
+            <UButton
+              icon="i-lucide-ellipsis-vertical"
+              color="neutral"
+              variant="ghost"
+              aria-label="Actions"
+            />
+          </UDropdownMenu>
+        </template>
+      </UTable>
+    </div>
   </div>
 </template>
 
