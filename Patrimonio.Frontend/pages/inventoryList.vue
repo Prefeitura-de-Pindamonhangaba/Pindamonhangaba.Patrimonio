@@ -2,7 +2,21 @@
 import type { DropdownMenuItem, TableColumn } from '@nuxt/ui';
 import type { Item } from '~/types/item';
 
-const { data: dataApi, pending, error } = await useFetch<Item[]>("http://localhost:5000/item");
+const { data: dataApi, pending, error, refresh } = await useAsyncData<Item[]>('items', () => 
+  $fetch('http://localhost:5000/item', {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include',
+    mode: 'cors',
+    onRequest({ request, options }) {
+      // Ensure credentials are properly set
+      options.credentials = 'include'
+    }
+  })
+);
 
 const data = computed(() => {
   return dataApi.value === null ? undefined : dataApi.value;
@@ -22,6 +36,10 @@ const toast = useToast();
 
 const handleRowClick = (row: Item) => {
   router.push(`/item/${row.id}`);
+}
+
+const handleRefresh = () => {
+  refresh();
 }
 
 function getDropdownActions(item: Item): DropdownMenuItem[][] {
@@ -58,16 +76,23 @@ function getDropdownActions(item: Item): DropdownMenuItem[][] {
 
 <template>
   <div>
-    <div v-if="pending" class="flex items-center justify-center h-64">
-      <ULoadingBar />
-    </div>
-    <div v-else-if="error" class="flex items-center justify-center h-64">
-      <UAlert
-        title="Erro ao carregar dados"
-        description="Não foi possível carregar a lista de patrimônios. Por favor, tente novamente."
-        color="error"
-        variant="soft"
-      />
+    <div v-if="error" class="flex items-center justify-center h-64">
+      <div class="text-center space-y-4">
+        <UAlert
+          title="Erro ao carregar dados"
+          description="Não foi possível carregar a lista de patrimônios. Por favor, tente novamente."
+          color="error"
+          variant="soft"
+        />
+        <UButton
+          icon="i-lucide-refresh-cw"
+          color="primary"
+          variant="solid"
+          @click="handleRefresh"
+        >
+          Tentar Novamente
+        </UButton>
+      </div>
     </div>
     <UTable 
       v-else
@@ -76,15 +101,15 @@ function getDropdownActions(item: Item): DropdownMenuItem[][] {
       class="flex-1" 
     >
       <template #action-cell="{ row }">
-      <UDropdownMenu :items="getDropdownActions(row.original)">
-        <UButton
-          icon="i-lucide-ellipsis-vertical"
-          color="neutral"
-          variant="ghost"
-          aria-label="Actions"
-        />
-      </UDropdownMenu>
-    </template>
+        <UDropdownMenu :items="getDropdownActions(row.original)">
+          <UButton
+            icon="i-lucide-ellipsis-vertical"
+            color="neutral"
+            variant="ghost"
+            aria-label="Actions"
+          />
+        </UDropdownMenu>
+      </template>
     </UTable>
   </div>
 </template>

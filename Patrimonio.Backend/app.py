@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from database import db
 from controllers.item_controller import item_bp
 from controllers.physical_location_controller import physical_location_bp
@@ -9,6 +10,13 @@ import psycopg2
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app, 
+     resources={r"/*": {
+         "origins": ["http://localhost:3000"],
+         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+         "allow_headers": ["Content-Type", "Authorization"],
+         "supports_credentials": True
+     }})
 
 app.config['DATABASE_HOST'] = f'{os.getenv('DB_HOST')}'
 app.config['DATABASE_NAME'] = f'{os.getenv('DB_NAME')}'
