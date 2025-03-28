@@ -94,7 +94,13 @@ def create_item():
 def listAllItems():
     db = SessionLocal()
     try:
-        items = db.query(Item).all()
+        asset_code = request.args.get('assetCode')
+        query = db.query(Item)
+        
+        if asset_code:
+            query = query.filter(Item.assetCode.ilike(f'%{asset_code}%'))
+            
+        items = query.all()
         result = []
         for item in items:
             physicalLocation = db.query(PhysicalLocation).filter(Item.physicalLocationId == PhysicalLocation.id).first()
