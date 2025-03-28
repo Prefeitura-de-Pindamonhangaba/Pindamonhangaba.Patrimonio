@@ -1,18 +1,22 @@
-export type Item = {
-  acquisitionDate: string;
-  acquisitionMethod: string;
-  assetCode: string;
-  createdAt: string;
-  description: string;
+import type { PhysicalLocation } from './physicalLocation';
+
+export interface Item {
   id: number;
-  imageUrl: string | null;
-  inventoried: boolean;
-  itemChanged: boolean;
-  observation: string | null;
-  oldPhysicalLocationId: number | null;
-  physicalLocationId: number;
-  reference: string;
-  status: string;
+  assetCode: string;
+  description: string;
+  acquisitionDate: string | null;
+  acquisitionMethod: string;
   supplier: string;
+  physicalLocationId: number;
+  oldPhysicalLocationId: number;
+  imageUrl: string;
+  status: string;
+  inventoried: boolean;
+  reference: string;
+  observation: string;
+  itemChanged: boolean;
+  createdAt: string;
   updatedAt: string;
+  physicalLocation: PhysicalLocation | null;
+  oldPhysicalLocation: PhysicalLocation | null;
 }
