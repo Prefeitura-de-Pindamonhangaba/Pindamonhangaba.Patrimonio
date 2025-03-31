@@ -38,7 +38,7 @@ const toggleSidebar = () => {
         <nav>
           <UButton label="Início" to="/" class="mb-2 w-full" />
           <UButton label="Lista de Patrimônios" to="/inventorylist" class="mb-2 w-full" />
-          <UButton label="Contato" to="/contato" class="w-full" />
+          <UButton label="Leitor de Código" to="/barcodeReader" class="mb-2 w-full" />
         </nav>
       </aside>
 
@@ -52,7 +52,7 @@ const toggleSidebar = () => {
         <nav class="p-4">
           <UButton label="Início" to="/" class="mb-2 w-full" @click="toggleSidebar" />
           <UButton label="Lista de Patrimônios" to="/inventorylist" class="mb-2 w-full" @click="toggleSidebar" />
-          <UButton label="Contato" to="/contato" class="w-full" @click="toggleSidebar" />
+          <UButton label="Leitor de Código" to="/barcodeReader" class="mb-2 w-full" @click="toggleSidebar" />
         </nav>
       </div>
 
