@@ -39,6 +39,53 @@ Base.metadata.create_all(bind=engine)
 
 item_bp = Blueprint('item', __name__, url_prefix='/item')
 
+def format_item(item, db):
+    physicalLocation = db.query(PhysicalLocation).filter(PhysicalLocation.id == item.physicalLocationId).first()
+    oldPhysicalLocation = db.query(PhysicalLocation).filter(PhysicalLocation.id == item.oldPhysicalLocationId).first()
+
+    return {
+        'id': item.id,
+        'assetCode': item.assetCode,
+        'description': item.description,
+        'acquisitionDate': item.acquisitionDate.isoformat() if item.acquisitionDate else None,
+        'acquisitionMethod': item.acquisitionMethod,
+        'supplier': item.supplier,
+        'physicalLocation': {
+            'id': physicalLocation.id,
+            'acronym': physicalLocation.acronym,
+            'active': physicalLocation.active,
+            'observation': physicalLocation.observation,
+            'module': physicalLocation.module,
+            'level': physicalLocation.level,
+            'code': physicalLocation.code,
+            'description': physicalLocation.description,
+            'managementUnit': physicalLocation.managementUnit,
+            'createdAt': physicalLocation.createdAt.isoformat(),
+            'updatedAt': physicalLocation.updatedAt.isoformat()
+        } if physicalLocation else None,
+        'oldPhysicalLocation': {
+            'id': oldPhysicalLocation.id,
+            'acronym': oldPhysicalLocation.acronym,
+            'active': oldPhysicalLocation.active,
+            'observation': oldPhysicalLocation.observation,
+            'module': oldPhysicalLocation.module,
+            'level': oldPhysicalLocation.level,
+            'code': oldPhysicalLocation.code,
+            'description': oldPhysicalLocation.description,
+            'managementUnit': oldPhysicalLocation.managementUnit,
+            'createdAt': oldPhysicalLocation.createdAt.isoformat(),
+            'updatedAt': oldPhysicalLocation.updatedAt.isoformat()
+        } if oldPhysicalLocation else None,
+        'imageUrl': item.imageUrl,
+        'status': item.status,
+        'inventoried': item.inventoried,
+        'reference': item.reference,
+        'observation': item.observation,
+        'itemChanged': item.itemChanged,
+        'createdAt': item.createdAt.isoformat(),
+        'updatedAt': item.updatedAt.isoformat()
+    }
+
 @item_bp.route('', methods=['POST'])
 def create_item():
     data = request.get_json()
@@ -66,24 +113,7 @@ def create_item():
         db.add(item)
         db.commit()
         db.refresh(item)
-        return jsonify({
-            'id': item.id,
-            'assetCode': item.assetCode,
-            'description': item.description,
-            'acquisitionDate': item.acquisitionDate.isoformat() if item.acquisitionDate else None,
-            'acquisitionMethod': item.acquisitionMethod,
-            'supplier': item.supplier,
-            'physicalLocationId': item.physicalLocationId,
-            'oldPhysicalLocationId': item.oldPhysicalLocationId,
-            'imageUrl': item.imageUrl,
-            'status': item.status,
-            'inventoried': item.inventoried,
-            'reference': item.reference,
-            'observation': item.observation,
-            'itemChanged': item.itemChanged,
-            'createdAt': item.createdAt.isoformat(),
-            'updatedAt': item.updatedAt.isoformat()
-        }), 201
+        return jsonify(format_item(item, db)), 201
     except Exception as e:
         db.rollback()
         return jsonify({'error': str(e)}), 500
@@ -118,53 +148,7 @@ def listAllItems():
         # Apply pagination
         items = query.offset((page - 1) * per_page).limit(per_page).all()
         
-        result = []
-        for item in items:
-            physicalLocation = db.query(PhysicalLocation).filter(Item.physicalLocationId == PhysicalLocation.id).first()
-            oldPhysicalLocation = db.query(PhysicalLocation).filter(Item.oldPhysicalLocationId == PhysicalLocation.id).first()
-
-            result.append({
-                'id': item.id,
-                'assetCode': item.assetCode,
-                'description': item.description,
-                'acquisitionDate': item.acquisitionDate.isoformat() if item.acquisitionDate else None,
-                'acquisitionMethod': item.acquisitionMethod,
-                'supplier': item.supplier,
-                'physicalLocation': {
-                    'id': physicalLocation.id,
-                    'acronym': physicalLocation.acronym,
-                    'active': physicalLocation.active,
-                    'observation': physicalLocation.observation,
-                    'module': physicalLocation.module,
-                    'level': physicalLocation.level,
-                    'code': physicalLocation.code,
-                    'description': physicalLocation.description,
-                    'managementUnit': physicalLocation.managementUnit,
-                    'createdAt': physicalLocation.createdAt.isoformat(),
-                    'updatedAt': physicalLocation.updatedAt.isoformat()
-                } if physicalLocation else None,
-                'oldPhysicalLocation': {
-                    'id': oldPhysicalLocation.id,
-                    'acronym': oldPhysicalLocation.acronym,
-                    'active': oldPhysicalLocation.active,
-                    'observation': oldPhysicalLocation.observation,
-                    'module': oldPhysicalLocation.module,
-                    'level': oldPhysicalLocation.level,
-                    'code': oldPhysicalLocation.code,
-                    'description': oldPhysicalLocation.description,
-                    'managementUnit': oldPhysicalLocation.managementUnit,
-                    'createdAt': oldPhysicalLocation.createdAt.isoformat(),
-                    'updatedAt': oldPhysicalLocation.updatedAt.isoformat()
-                } if oldPhysicalLocation else None,
-                'imageUrl': item.imageUrl,
-                'status': item.status,
-                'inventoried': item.inventoried,
-                'reference': item.reference,
-                'observation': item.observation,
-                'itemChanged': item.itemChanged,
-                'createdAt': item.createdAt.isoformat(),
-                'updatedAt': item.updatedAt.isoformat()
-            })
+        result = [format_item(item, db) for item in items]
             
         return jsonify({
             'items': result,
@@ -184,25 +168,48 @@ def getItemById(item_id):
     db = SessionLocal()
     try:
         item = db.query(Item).filter(Item.id == item_id).first()
-        print(item_id)
-        return jsonify({
-            'id': item.id,
-            'assetCode': item.assetCode,
-            'description': item.description,
-            'acquisitionDate': item.acquisitionDate.isoformat() if item.acquisitionDate else None,
-            'acquisitionMethod': item.acquisitionMethod,
-            'supplier': item.supplier,
-            'physicalLocationId': item.physicalLocationId,
-            'oldPhysicalLocationId': item.oldPhysicalLocationId,
-            'imageUrl': item.imageUrl,
-            'status': item.status,
-            'inventoried': item.inventoried,
-            'reference': item.reference,
-            'observation': item.observation,
-            'itemChanged': item.itemChanged,
-            'createdAt': item.createdAt.isoformat(),
-            'updatedAt': item.updatedAt.isoformat()
-        }), 201
+        if not item:
+            return jsonify({'error': 'Item não encontrado'}), 404
+        return jsonify(format_item(item, db)), 200
+    except Exception as e:
+        db.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        db.close()
+
+@item_bp.route('/<int:item_id>', methods=['PUT'])
+def update_item(item_id):
+    data = request.get_json()
+    db = SessionLocal()
+    try:
+        item = db.query(Item).filter(Item.id == item_id).first()
+        if not item:
+            return jsonify({'error': 'Item não encontrado'}), 404
+
+        for key, value in data.items():
+            if hasattr(item, key):
+                setattr(item, key, value)
+
+        db.commit()
+        db.refresh(item)
+        return jsonify(format_item(item, db)), 200
+    except Exception as e:
+        db.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        db.close()
+
+@item_bp.route('/<int:item_id>', methods=['DELETE'])
+def delete_item(item_id):
+    db = SessionLocal()
+    try:
+        item = db.query(Item).filter(Item.id == item_id).first()
+        if not item:
+            return jsonify({'error': 'Item não encontrado'}), 404
+
+        db.delete(item)
+        db.commit()
+        return jsonify({'message': 'Item removido com sucesso'}), 200
     except Exception as e:
         db.rollback()
         return jsonify({'error': str(e)}), 500

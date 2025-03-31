@@ -2,7 +2,7 @@ export interface PhysicalLocation {
   id: number;
   acronym: string;
   active: boolean;
-  observation: string;
+  observation: string | null;
   module: string;
   level: number;
   code: string;

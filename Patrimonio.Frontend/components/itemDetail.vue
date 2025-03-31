@@ -66,7 +66,7 @@ const handleBack = () => {
         <div class="space-y-4">
           <div>
             <div class="text-sm text-gray-400">Data de Aquisição</div>
-            <div class="text-white">{{ new Date(item.acquisitionDate).toLocaleDateString() }}</div>
+            <div class="text-white">{{ item.acquisitionDate ? new Date(item.acquisitionDate).toLocaleDateString() : '-' }}</div>
           </div>
           <div>
             <div class="text-sm text-gray-400">Método de Aquisição</div>
@@ -86,12 +86,12 @@ const handleBack = () => {
 
         <div class="space-y-4">
           <div>
-            <div class="text-sm text-gray-400">ID do Local Físico Atual</div>
-            <div class="text-white">{{ item.physicalLocationId }}</div>
+            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Local Físico</div>
+            <div class="mt-1">{{ item.physicalLocation?.description }}</div>
           </div>
           <div>
-            <div class="text-sm text-gray-400">ID do Local Físico Anterior</div>
-            <div class="text-white">{{ item.oldPhysicalLocationId || 'Não especificado' }}</div>
+            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Local Físico Antigo</div>
+            <div class="mt-1">{{ item.oldPhysicalLocation?.description || '-' }}</div>
           </div>
         </div>
       </UCard>

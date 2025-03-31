@@ -5,18 +5,16 @@ export interface Item {
   assetCode: string;
   description: string;
   acquisitionDate: string | null;
-  acquisitionMethod: string;
-  supplier: string;
-  physicalLocationId: number;
-  oldPhysicalLocationId: number;
-  imageUrl: string;
-  status: string;
+  acquisitionMethod: string | null;
+  supplier: string | null;
+  physicalLocation: PhysicalLocation | null;
+  oldPhysicalLocation: PhysicalLocation | null;
+  imageUrl: string | null;
+  status: string | null;
   inventoried: boolean;
-  reference: string;
-  observation: string;
+  reference: string | null;
+  observation: string | null;
   itemChanged: boolean;
   createdAt: string;
   updatedAt: string;
-  physicalLocation: PhysicalLocation | null;
-  oldPhysicalLocation: PhysicalLocation | null;
 }
