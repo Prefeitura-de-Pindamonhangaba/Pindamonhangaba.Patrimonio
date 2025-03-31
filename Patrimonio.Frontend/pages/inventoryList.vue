@@ -161,20 +161,20 @@ function getDropdownActions(item: Item): DropdownMenuItem[][] {
           </UDropdownMenu>
         </template>
       </UTable>
-      <div class="fixed bottom-0 left-[280px] right-0 border-t border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm z-10">
+      <div class="fixed bottom-0 left-0 right-0 border-t border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm z-10 md:left-[280px]">
         <div class="px-4 py-3">
-          <div class="flex items-center justify-between">
-            <div class="text-sm text-gray-500 dark:text-gray-400">
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">
               Mostrando {{ (currentPage - 1) * perPage + 1 }} a {{ Math.min(currentPage * perPage, totalItems) }} de {{ totalItems }} itens
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 sm:gap-3">
               <UButton
                 icon="i-lucide-chevron-left"
                 color="primary"
                 variant="ghost"
                 :disabled="currentPage === 1"
                 @click="handlePageChange(currentPage - 1)"
-                class="min-w-[40px] h-10"
+                class="min-w-[36px] h-9 sm:min-w-[40px] sm:h-10"
               />
               <div class="flex items-center gap-1">
                 <template v-for="page in totalPages" :key="page">
@@ -183,13 +183,13 @@ function getDropdownActions(item: Item): DropdownMenuItem[][] {
                     :color="page === currentPage ? 'primary' : 'neutral'"
                     :variant="page === currentPage ? 'solid' : 'ghost'"
                     @click="handlePageChange(page)"
-                    class="min-w-[40px] h-10 flex items-center justify-center"
+                    class="min-w-[36px] h-9 sm:min-w-[40px] sm:h-10 flex items-center justify-center text-sm sm:text-base"
                   >
                     {{ page }}
                   </UButton>
                   <span
                     v-else-if="page === currentPage - 2 || page === currentPage + 2"
-                    class="px-2 text-gray-500 dark:text-gray-400"
+                    class="px-1 sm:px-2 text-gray-500 dark:text-gray-400 text-sm sm:text-base"
                   >
                     ...
                   </span>
@@ -201,7 +201,7 @@ function getDropdownActions(item: Item): DropdownMenuItem[][] {
                 variant="ghost"
                 :disabled="currentPage === totalPages"
                 @click="handlePageChange(currentPage + 1)"
-                class="min-w-[40px] h-10"
+                class="min-w-[36px] h-9 sm:min-w-[40px] sm:h-10"
               />
             </div>
           </div>
