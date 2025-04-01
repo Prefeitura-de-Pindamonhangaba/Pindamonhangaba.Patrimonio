@@ -3,6 +3,7 @@ from flask_cors import CORS
 from database import db
 from controllers.item_controller import item_bp
 from controllers.physical_location_controller import physical_location_bp
+from controllers.user_controller import user_bp
 import os
 from dotenv import load_dotenv
 import psycopg2
@@ -27,6 +28,7 @@ db.init_app(app)
 
 app.register_blueprint(item_bp)
 app.register_blueprint(physical_location_bp)
+app.register_blueprint(user_bp)
 
 @app.route('/')
 def index():
