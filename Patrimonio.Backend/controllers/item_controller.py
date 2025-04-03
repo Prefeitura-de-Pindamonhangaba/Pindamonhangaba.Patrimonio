@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 from models.physical_location_model import PhysicalLocation
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 load_dotenv()
 
@@ -87,7 +88,9 @@ def format_item(item, db):
     }
 
 @item_bp.route('', methods=['POST'])
+@jwt_required()  # Requer autenticação JWT
 def create_item():
+    current_user = get_jwt_identity()  # Obtém o usuário atual
     data = request.get_json()
     if not data or 'assetCode' not in data:
         return jsonify({'error': 'assetCode é obrigatório'}), 400
@@ -121,6 +124,7 @@ def create_item():
         db.close()
 
 @item_bp.route('', methods=['GET'])
+@jwt_required()  # Requer autenticação JWT
 def listAllItems():
     db = SessionLocal()
     try:
@@ -164,6 +168,7 @@ def listAllItems():
         db.close()
 
 @item_bp.route('/<int:item_id>', methods=['GET'])
+@jwt_required()  # Requer autenticação JWT
 def getItemById(item_id):
     db = SessionLocal()
     try:
@@ -178,6 +183,7 @@ def getItemById(item_id):
         db.close()
 
 @item_bp.route('/<int:item_id>', methods=['PUT'])
+@jwt_required()  # Requer autenticação JWT
 def update_item(item_id):
     data = request.get_json()
     db = SessionLocal()
@@ -200,7 +206,14 @@ def update_item(item_id):
         db.close()
 
 @item_bp.route('/<int:item_id>', methods=['DELETE'])
+@jwt_required()  # Requer autenticação JWT
 def delete_item(item_id):
+    current_user = get_jwt_identity()
+    
+    # Verificar se o usuário tem permissão para excluir (opcional)
+    if current_user.get('role') != 'admin':
+        return jsonify({'error': 'Permissão negada'}), 403
+        
     db = SessionLocal()
     try:
         item = db.query(Item).filter(Item.id == item_id).first()
